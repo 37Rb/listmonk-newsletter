@@ -1,11 +1,23 @@
 """Fetches feed entries from an RSS URL using feedparser."""
 
+import time
+from datetime import datetime
+
 import feedparser
 from structlog_config import configure_logger
 
 from .entry import Entry
 
 log = configure_logger()
+
+
+def _format_published(entry) -> str | None:
+    parsed = entry.get("published_parsed") or entry.get("updated_parsed")
+
+    if parsed is None:
+        return None
+
+    return datetime.fromtimestamp(time.mktime(parsed)).strftime("%B %-d, %Y")
 
 
 def fetch_entries(rss_url: str) -> list[Entry]:
@@ -25,6 +37,7 @@ def fetch_entries(rss_url: str) -> list[Entry]:
             link=e.get("link", ""),
             description=e.get("summary", ""),
             summary=e.get("summary", ""),
+            published=_format_published(e),
         )
         for e in feed.entries
     ]

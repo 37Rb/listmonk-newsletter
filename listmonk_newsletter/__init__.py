@@ -157,7 +157,7 @@ def build_readwise_articles() -> tuple[list[ReadwiseArticle], ZonedDateTime | No
     readwise_tag = config("READWISE_TAG", default=None)
 
     if not readwise_token or not readwise_tag:
-        log.error(
+        log.info(
             "no token or tag, readwise articles skipped",
             readwise_token_present=readwise_token is not None,
             readwise_tag_present=readwise_tag is not None,
@@ -249,17 +249,20 @@ def write_feed_entry_links(entry_links: list[str]) -> None:
     (requests.exceptions.RequestException),
     max_tries=BACKOFF_LIMIT,
 )
-def get_og_image(url: str) -> str | None:
-    "Pull the image tied to a blog post"
+def get_og_metadata(url: str) -> tuple[str | None, str | None]:
+    "Pull the og:image and og:description tied to a blog post"
 
     html = requests.get(url).content
 
     tree = etree.fromstring(html, etree.HTMLParser())
 
     og_image = tree.find("head/meta[@property='og:image']")
+    og_description = tree.find("head/meta[@property='og:description']")
 
-    if og_image is not None:
-        return og_image.get("content")
+    image = og_image.get("content") if og_image is not None else None
+    description = og_description.get("content") if og_description is not None else None
+
+    return image, description
 
 
 @backoff.on_exception(
@@ -414,9 +417,13 @@ def generate_campaign():
         feed_entries=len(all_entries),
     )
 
-    def add_og_image(entry):
-        if not entry.get("image"):
-            entry["image"] = get_og_image(entry.link)
+    def add_og_metadata(entry):
+        if not entry.get("image") or not entry.get("og_description"):
+            image, description = get_og_metadata(entry.link)
+            if not entry.get("image"):
+                entry["image"] = image
+            if not entry.get("og_description"):
+                entry["og_description"] = description
         return entry
 
     if first_run:
@@ -424,13 +431,13 @@ def generate_campaign():
 
         new_entries = (
             all_entries[:FEED_MAX_ITEMS][::-1]
-            | fp.lmap(add_og_image)
+            | fp.lmap(add_og_metadata)
         )
     else:
         new_entries = (
             all_entries
             | fp.filter(lambda e: e.link not in entry_links_last_update)
-            | fp.lmap(add_og_image)
+            | fp.lmap(add_og_metadata)
         )
 
     new_entries = list(new_entries)
