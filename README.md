@@ -7,16 +7,12 @@ This is a fork of [iloveitaly/listmonk-newsletter](https://github.com/iloveitaly
 ## Enhancements Over Upstream
 
 - **Discourse support** — pull entries from a Discourse JSON API endpoint in addition to RSS
-- **Custom email templates** — bring your own Jinja2 template with full CSS inlining
 - **Multi-environment support** — run separate newsletter instances from one deployment, each with isolated state and templates via `DATA_SUBDIRECTORY`
 - **OG metadata** — automatically fetches `og:image` and `og:description` for each post and makes them available in templates
 - **Dynamic titles** — `LISTMONK_TITLE` supports `strftime` format codes (e.g. `"Weekly Digest %-m/%-d/%y"`)
 - **Dynamic subheader** — title is passed into the Jinja2 template context for use as a subheader
 - **Configurable feed limit** — `FEED_MAX_ITEMS` caps how many posts appear per campaign
 - **API token auth** — uses `LISTMONK_API_TOKEN` instead of a password
-- **Readwise Reader integration** — include articles you've tagged in Readwise Reader
-- **GitHub activity summary** — summarize your recent GitHub releases and new repos using Gemini AI
-- **AI-generated subject lines** — optionally use Gemini to write the campaign subject line based on content
 
 ## How It Works
 
