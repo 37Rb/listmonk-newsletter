@@ -3,7 +3,6 @@ Fetches articles read in Readwise Reader with specific tags.
 Used in generate_campaign() to build optional newsletter section.
 """
 
-from pathlib import Path
 from pprint import pprint
 
 import backoff
@@ -13,6 +12,8 @@ import structlog
 from decouple import config
 from pydantic import BaseModel
 from whenever import Instant, ZonedDateTime, days
+
+from .paths import ACTIVE_DATA_DIRECTORY
 
 log = structlog.get_logger()
 
@@ -29,8 +30,8 @@ class ReadwiseArticle(BaseModel):
     summary: str | None = None
 
 
-def get_state_file_path() -> Path:
-    return Path(__file__).parent.parent / "data" / "last_readwise_checked.txt"
+def get_state_file_path():
+    return ACTIVE_DATA_DIRECTORY / "last_readwise_checked.txt"
 
 
 def get_last_readwise_check() -> ZonedDateTime | None:

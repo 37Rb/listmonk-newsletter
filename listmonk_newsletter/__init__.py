@@ -1,6 +1,4 @@
 from datetime import datetime
-from pathlib import Path
-
 import backoff
 import click
 import css_inline
@@ -16,6 +14,7 @@ from structlog_config import configure_logger
 from whenever import Instant, ZonedDateTime
 
 from .feed import Entry, rss as feed_rss, discourse as feed_discourse
+from .paths import ROOT_DIRECTORY, ACTIVE_DATA_DIRECTORY
 from .readwise import (
     ReadwiseArticle,
     get_last_readwise_check,
@@ -31,11 +30,9 @@ from .summarize_github import (
 
 log = configure_logger()
 
-ROOT_DIRECTORY = Path(__file__).parent.parent.resolve()
-DATA_DIRECTORY = ROOT_DIRECTORY / "data"
-FEED_ENTRY_LINKS_FILE = DATA_DIRECTORY / "processed_links.txt"
-CONTENT_TEMPLATE_FILE = DATA_DIRECTORY / config("TEMPLATE_FILE", default="template.j2")
-GITHUB_LAST_CHECKED_FILE = DATA_DIRECTORY / "last_github_checked.txt"
+FEED_ENTRY_LINKS_FILE = ACTIVE_DATA_DIRECTORY / "processed_links.txt"
+CONTENT_TEMPLATE_FILE = ACTIVE_DATA_DIRECTORY / "template.j2"
+GITHUB_LAST_CHECKED_FILE = ACTIVE_DATA_DIRECTORY / "last_github_checked.txt"
 
 RSS_URL = config("RSS_URL", default=None)
 DISCOURSE_JSON_URL = config("DISCOURSE_JSON_URL", default=None)
@@ -61,7 +58,7 @@ LISTMONK_REQUEST_HEADERS = {
 
 
 def ensure_data_resources() -> None:
-    DATA_DIRECTORY.mkdir(parents=True, exist_ok=True)
+    ACTIVE_DATA_DIRECTORY.mkdir(parents=True, exist_ok=True)
 
     if not FEED_ENTRY_LINKS_FILE.exists():
         FEED_ENTRY_LINKS_FILE.write_text("", encoding="utf-8")

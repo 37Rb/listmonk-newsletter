@@ -4,10 +4,8 @@ __pycache__
 
 .envrc
 .env
+.envs/
 
-data/processed_links.txt
-data/last_github_checked.txt
-data/last_readwise_checked.txt
-data/templates/
+data/
 
 tmp/
