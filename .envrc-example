@@ -1,41 +1,50 @@
 layout uv
 
-export LISTMONK_URL="https://listmonk.app"
+export LISTMONK_URL="https://listmonk.example.com"
 export LISTMONK_USERNAME="username"
 export LISTMONK_API_TOKEN="your_api_token_here"
 
-# use one or the other
-export RSS_URL="https://blog.com/feed"
-# export DISCOURSE_JSON_URL="https://discourse.example.com/latest.json"
+# use one of these two feed sources
+export RSS_URL="https://blog.example.com/feed"
+# export DISCOURSE_JSON_URL="https://discourse.example.com/c/blog/1.json"
 
-# maximum number of feed items to include in a campaign (default: 5)
-# export FEED_MAX_ITEMS=5
-
-# template file to use for the campaign email, relative to the data/ directory (default: template.j2)
-# export TEMPLATE_FILE=template.j2
-
-# which listmonk template to use, should be an empty template
-export LISTMONK_TEMPLATE = 4
+# which listmonk template to use — should be an empty/passthrough template
+export LISTMONK_TEMPLATE=4
 
 # comma-separated list of listmonk list IDs to send the campaign to
 export LISTMONK_LISTS=1
 
-# title to use for the campaign
-export LISTMONK_TITLE="Latest Posts from Example"
+# title for the campaign subject; supports strftime format codes for dynamic dates
+export LISTMONK_TITLE="Latest Posts %-m/%-d/%y"
 
-# optional: when to send the campaign after it's been created
-export LISTMONK_SEND_AT = "monday 5am"
+# subdirectory under data/ for this environment's state files and template
+# omit to use data/ directly (single-environment setup)
+# export DATA_SUBDIRECTORY=blog-home
 
-# list of emails to send test campaigns to
-export LISTMONK_TEST_EMAILS="test@example.com,test2@example.com"
+# max feed items to include per campaign (default: 5)
+# export FEED_MAX_ITEMS=5
 
-# cron-style schedule for when to generate the newsletter
+# optional: schedule the campaign to send at a future time (natural language)
+# export LISTMONK_SEND_AT="monday 5am"
+
+# optional: send test campaigns to these emails instead of launching the campaign
+# export LISTMONK_TEST_EMAILS="test@example.com"
+
+# cron schedule for when to generate and send the newsletter
 export SCHEDULE="0 6 * * 1"
 
 # optional: readwise reader integration
 # get your token from https://readwise.io/access_token
-export READWISE_API_TOKEN=""
-# tag to filter articles (e.g., "newsletter", "public", "share")
-export READWISE_TAG="newsletter"
-# optional: days to look back on first run (default: 30)
-export READWISE_SUMMARY_DAYS=30
+# export READWISE_API_TOKEN=""
+# export READWISE_TAG="newsletter"
+# export READWISE_SUMMARY_DAYS=30
+
+# optional: github activity summary via gemini
+# export GITHUB_TOKEN="ghp_..."
+# export GITHUB_USERNAME="your-github-username"
+# export GOOGLE_API_KEY="..."
+# export GITHUB_SUMMARY_DAYS=30
+# export GEMINI_MODEL="gemini-flash-latest"
+
+# optional: AI-generated subject lines via gemini
+# export LISTMONK_GEMINI_SUBJECT=true
