@@ -1,4 +1,8 @@
-Coding instructions for all programming languages:
+## Git
+
+- Never commit unless explicitly asked to.
+
+## Coding instructions for all programming languages:
 
 - If no language is specified, assume the latest version of python.
 - If tokens or other secrets are needed, pull them from an environment variable
