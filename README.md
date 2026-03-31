@@ -116,19 +116,14 @@ Run separate newsletter instances (e.g. one per blog) from a single deployment b
 - `last_github_checked.txt` — GitHub activity checkpoint
 - `last_readwise_checked.txt` — Readwise checkpoint
 
-### Local Development
-
 Use `uv run --env-file` to target a specific environment:
 
 ```sh
-# run against the blog-home environment
 uv run --env-file .envs/blog-home.env listmonk-newsletter
-
-# run against the blog-business environment
 uv run --env-file .envs/blog-business.env listmonk-newsletter
 ```
 
-Each `.env` file sets `DATA_SUBDIRECTORY` to point at its own subdirectory:
+Each env file sets `DATA_SUBDIRECTORY` to point at its own subdirectory:
 
 ```sh
 # .envs/blog-home.env
@@ -138,40 +133,14 @@ LISTMONK_TITLE="Home Blog %-m/%-d/%y"
 ...
 ```
 
-### Production (Docker Compose)
+### Production
 
-Define one service per environment in `docker-compose.yml`. Each service has its own env file and named volume:
+Run the same commands on your server, scheduled via system cron:
 
-```yaml
-services:
-  blog-home:
-    image: ghcr.io/37rb/listmonk-newsletter:latest
-    restart: always
-    env_file:
-      - .envs/blog-home.env
-    environment:
-      - TZ=${TZ}
-    volumes:
-      - blog-home-data:/app/data
-
-  blog-business:
-    image: ghcr.io/37rb/listmonk-newsletter:latest
-    restart: always
-    env_file:
-      - .envs/blog-business.env
-    environment:
-      - TZ=${TZ}
-    volumes:
-      - blog-business-data:/app/data
-
-volumes:
-  blog-home-data:
-  blog-business-data:
+```sh
+0 11 * * 3 cd /home/user/listmonk-newsletter && uv run --env-file .envs/blog-home.env listmonk-newsletter
+0 11 * * 3 cd /home/user/listmonk-newsletter && uv run --env-file .envs/blog-business.env listmonk-newsletter
 ```
-
-Each service has its own Docker volume, so state files are fully isolated. `DATA_SUBDIRECTORY` is still set in each env file and determines the subdirectory within `/app/data` where state and templates are stored.
-
-> **Timezone:** The container does not inherit the host timezone automatically. Set `TZ` on the host and pass it through, or hardcode it (e.g. `TZ=America/New_York`).
 
 ## Running Locally
 
@@ -211,8 +180,4 @@ data/
     processed_links.txt
 ```
 
-The `data/` directory is gitignored — copy state files off a running container with:
-
-```sh
-docker compose cp blog-home:/app/data/. data/blog-home/
-```
+The `data/` directory is gitignored.
