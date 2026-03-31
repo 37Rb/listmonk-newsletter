@@ -145,7 +145,7 @@ Define one service per environment in `docker-compose.yml`. Each service has its
 ```yaml
 services:
   blog-home:
-    image: ghcr.io/iloveitaly/listmonk-newsletter:latest
+    image: ghcr.io/37rb/listmonk-newsletter:latest
     restart: always
     env_file:
       - .envs/blog-home.env
@@ -155,7 +155,7 @@ services:
       - blog-home-data:/app/data
 
   blog-business:
-    image: ghcr.io/iloveitaly/listmonk-newsletter:latest
+    image: ghcr.io/37rb/listmonk-newsletter:latest
     restart: always
     env_file:
       - .envs/blog-business.env
@@ -169,7 +169,7 @@ volumes:
   blog-business-data:
 ```
 
-Each service has its own Docker volume, so state files are fully isolated. The `DATA_SUBDIRECTORY` variable is not needed in this configuration — each container has its own `data/` volume root.
+Each service has its own Docker volume, so state files are fully isolated. `DATA_SUBDIRECTORY` is still set in each env file and determines the subdirectory within `/app/data` where state and templates are stored.
 
 > **Timezone:** The container does not inherit the host timezone automatically. Set `TZ` on the host and pass it through, or hardcode it (e.g. `TZ=America/New_York`).
 
