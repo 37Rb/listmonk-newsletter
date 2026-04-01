@@ -7,6 +7,7 @@ import feedparser
 from structlog_config import configure_logger
 
 from .entry import Entry
+from .teaser import fetch_article_metadata
 
 log = configure_logger()
 
@@ -31,13 +32,19 @@ def fetch_entries(rss_url: str) -> list[Entry]:
         log.error("feed is empty")
         return []
 
-    return [
-        Entry(
+    entries = []
+
+    for e in feed.entries:
+        link = e.get("link", "")
+        _, og_description, teaser = fetch_article_metadata(link) if link else (None, None, "")
+
+        entries.append(Entry(
             title=e.get("title", ""),
-            link=e.get("link", ""),
-            description=e.get("summary", ""),
+            link=link,
+            description=teaser,
             summary=e.get("summary", ""),
+            og_description=og_description,
             published=_format_published(e),
-        )
-        for e in feed.entries
-    ]
+        ))
+
+    return entries

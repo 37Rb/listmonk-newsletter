@@ -8,12 +8,12 @@ import html2text
 import jinja2
 import requests
 from decouple import Csv, config
-from lxml import etree
 from markdown import markdown
 from structlog_config import configure_logger
 from whenever import Instant, ZonedDateTime
 
 from .feed import Entry, rss as feed_rss, discourse as feed_discourse
+from .feed.teaser import fetch_article_metadata
 from .paths import ROOT_DIRECTORY, ACTIVE_DATA_DIRECTORY
 from .readwise import (
     ReadwiseArticle,
@@ -240,26 +240,6 @@ def write_feed_entry_links(entry_links: list[str]) -> None:
     FEED_ENTRY_LINKS_FILE.write_text("\n".join(entry_links), encoding="utf-8")
 
 
-@backoff.on_exception(
-    backoff.expo,
-    # highest exception up the exception hierarchy
-    (requests.exceptions.RequestException),
-    max_tries=BACKOFF_LIMIT,
-)
-def get_og_metadata(url: str) -> tuple[str | None, str | None]:
-    "Pull the og:image and og:description tied to a blog post"
-
-    html = requests.get(url).content
-
-    tree = etree.fromstring(html, etree.HTMLParser())
-
-    og_image = tree.find("head/meta[@property='og:image']")
-    og_description = tree.find("head/meta[@property='og:description']")
-
-    image = og_image.get("content") if og_image is not None else None
-    description = og_description.get("content") if og_description is not None else None
-
-    return image, description
 
 
 @backoff.on_exception(
@@ -416,7 +396,7 @@ def generate_campaign():
 
     def add_og_metadata(entry):
         if not entry.get("image") or not entry.get("og_description"):
-            image, description = get_og_metadata(entry.link)
+            image, description, _teaser = fetch_article_metadata(entry.link)
             if not entry.get("image"):
                 entry["image"] = image
             if not entry.get("og_description"):
