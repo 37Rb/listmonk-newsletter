@@ -33,6 +33,7 @@ def _extract_teaser(tree, word_count: int) -> str:
         _paragraph_text(p)
         for p in paragraphs
         if len(_paragraph_text(p).split()) >= MIN_PARAGRAPH_WORDS
+        and "c-post-byline" not in (p.get("class") or "")
     )
     text = re.sub(r"\s+", " ", text).strip()
 
